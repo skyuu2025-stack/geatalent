@@ -2,7 +2,7 @@ import type { Config } from "tailwindcss";
 
 const config: Config = {
   content: [
-    "./src/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/**/*.{js,ts,jsx,tsx,mdx}", // 检查这一行是否完全正确
   ],
   theme: {
     extend: {
@@ -12,7 +12,7 @@ const config: Config = {
         "royal-blue": "#002366",
       },
       fontFamily: {
-        serif: ["serif"],
+        serif: ["Playfair Display", "serif"],
         sans: ["system-ui", "sans-serif"],
       },
     },
