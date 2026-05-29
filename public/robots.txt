@@ -1,2 +1,4 @@
 User-agent: *
 Allow: /
+# 告诉 Google 你的地图地址
+Sitemap: https://geatalent.uk/sitemap.xml
