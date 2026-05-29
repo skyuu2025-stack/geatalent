@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   ArrowUpRight, ShieldCheck, Globe, Cpu, Zap, 
-  Check, ChevronRight, Activity, Lock, Coins, Copy, X, Smartphone 
+  Check, ChevronRight, Activity, Lock, Coins, Copy, X 
 } from "lucide-react";
 import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 
@@ -16,26 +16,26 @@ export default function GeatalentFinalPage() {
   // 你的 Solana 钱包地址
   const walletAddress = "BQeaNnGCRtBnFye7ynSGhFtgzUgUjiCo4QmAKNbgqWh1";
 
-  // 定义三个档位的价格和环境变量 ID
+  // 定义三个档位的价格和环境变量 ID (这些变量里现在应该存的是完整的 buy.stripe.com 链接)
   const pricingPlans = [
     { 
       name: "Basic Alpha", 
       price: "£190", 
-      priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC,
-      features: ["Telegram Feed", "Weekly Trend Analysis", "Initial Strategy Audit"] 
+      priceLink: process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC,
+      features: ["Initial Strategy Audit", "Global Talent Pathway Map", "Telegram Signal Feed"] 
     },
     { 
       name: "Intel Pro", 
       price: "£490", 
-      priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO,
-      features: ["Smart Wallet Tracking", "AI Narrative Alerts", "Full Dashboard Access", "Priority Support"], 
+      priceLink: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO,
+      features: ["Portfolio Narrative Build", "Smart Wallet Tracking", "AI Narrative Alerts", "Priority Support"], 
       popular: true 
     },
     { 
       name: "Strategic Premium", 
       price: "£990", 
-      priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_PREMIUM,
-      features: ["1-on-1 Consultation", "VIP Early Signals", "Bespoke Portfolio Roadmap", "Full PR Strategy"] 
+      priceLink: process.env.NEXT_PUBLIC_STRIPE_PRICE_PREMIUM,
+      features: ["1-on-1 Bespoke Consultation", "Full PR & Media Strategy", "VIP Early Signals", "End-to-End Endorsement"] 
     },
   ];
 
@@ -73,7 +73,7 @@ export default function GeatalentFinalPage() {
         <div className="flex items-center gap-4">
           <SignedOut>
             <SignInButton mode="modal">
-              <button className="px-6 py-2 bg-white text-black text-[10px] font-bold uppercase tracking-widest rounded-full hover:bg-[#004225] hover:text-white transition-all duration-500">
+              <button className="px-6 py-2 bg-white text-black text-[10px] font-bold uppercase tracking-widest rounded-full hover:bg-[#004225] hover:text-white transition-all">
                 Connect
               </button>
             </SignInButton>
@@ -96,7 +96,7 @@ export default function GeatalentFinalPage() {
             </div>
             <h1 className="text-5xl md:text-7xl lg:text-[110px] font-bold tracking-tighter leading-[1.1] md:leading-[0.9] mb-8 text-white uppercase">
               Build Your <br />
-              <span className="italic font-serif font-light text-zinc-400">Global Talent</span>
+              <span className="italic font-serif font-light text-zinc-300">Global Talent</span>
             </h1>
             <p className="text-zinc-300 text-sm md:text-lg max-w-xl mx-auto mb-12 leading-relaxed opacity-90 px-4 italic font-light">
               Strategic portfolio architecture and AI-driven intelligence for high-tier professionals.
@@ -107,12 +107,12 @@ export default function GeatalentFinalPage() {
           </motion.div>
         </section>
 
-        {/* 定价方案 Pricing - 已更新为 190, 490, 990 */}
+        {/* 定价方案 Pricing */}
         <section id="pricing" className="py-40 px-6 border-t border-white/10 bg-black/40">
-           <div className="max-w-7xl mx-auto">
+           <div className="max-w-7xl mx-auto text-left">
               <div className="text-center mb-24">
                 <h2 className="text-5xl font-serif italic mb-6">Invest in Excellence.</h2>
-                <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.4em]">Stripe & Direct USDC Payments.</p>
+                <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.4em]">Stripe & Direct USDC Payments Accepted.</p>
               </div>
               
               <div className="grid md:grid-cols-3 gap-8 md:gap-12">
@@ -129,12 +129,13 @@ export default function GeatalentFinalPage() {
                     </div>
                     
                     <div className="space-y-4">
-                      {/* Stripe 支付逻辑 */}
+                      {/* Stripe 支付按钮 - 直接跳转 */}
                       <button 
                         onClick={() => {
-                          if (plan.priceId) {
-                            // 这里可以对接具体的 Stripe Checkout 逻辑，或者跳转到你的 Stripe 支付链接
-                            window.location.href = `https://buy.stripe.com/${plan.priceId}`;
+                          if (plan.priceLink) {
+                            window.location.href = plan.priceLink;
+                          } else {
+                            alert("Payment link configuration is updating. Please try again in a minute.");
                           }
                         }}
                         className={`w-full py-4 text-[10px] font-bold uppercase tracking-widest rounded-full transition-all ${plan.popular ? 'bg-white text-black hover:bg-zinc-200' : 'border border-zinc-800 text-zinc-400 hover:text-white'}`}
@@ -142,7 +143,7 @@ export default function GeatalentFinalPage() {
                         Access with Card
                       </button>
                       
-                      {/* USDC 支付弹窗 */}
+                      {/* USDC 支付按钮 */}
                       <button 
                         onClick={() => openPayModal(plan.name, plan.price)}
                         className="flex items-center justify-center gap-2 w-full py-4 text-[10px] font-bold uppercase tracking-widest rounded-full border border-[#002366]/30 text-zinc-500 hover:bg-[#002366] hover:text-white transition-all"
@@ -161,55 +162,35 @@ export default function GeatalentFinalPage() {
       <AnimatePresence>
         {isPayModalOpen && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
-            <motion.div 
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              onClick={() => setIsPayModalOpen(false)}
-              className="absolute inset-0 bg-black/90 backdrop-blur-sm"
-            />
-            <motion.div 
-              initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
-              className="relative w-full max-w-md bg-zinc-950 border border-white/10 p-8 rounded-3xl shadow-2xl"
-            >
-              <button onClick={() => setIsPayModalOpen(false)} className="absolute top-6 right-6 text-zinc-500 hover:text-white">
-                <X className="w-5 h-5" />
-              </button>
-              
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsPayModalOpen(false)} className="absolute inset-0 bg-black/90 backdrop-blur-sm" />
+            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="relative w-full max-w-md bg-zinc-950 border border-white/10 p-8 rounded-3xl shadow-2xl">
+              <button onClick={() => setIsPayModalOpen(false)} className="absolute top-6 right-6 text-zinc-500 hover:text-white"><X className="w-5 h-5" /></button>
               <div className="mb-8 text-left">
-                <h3 className="text-xl font-serif italic mb-2">Direct USDC Payment</h3>
+                <h3 className="text-xl font-serif italic mb-2 text-white">Direct USDC Payment</h3>
                 <p className="text-[10px] text-zinc-500 uppercase tracking-[0.2em]">Plan: {selectedPlan.name} • {selectedPlan.price}</p>
               </div>
-
               <div className="space-y-6">
                 <div className="bg-zinc-900/50 p-6 rounded-2xl border border-white/5 space-y-4">
                   <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-zinc-500">
                     <span>Network</span>
-                    <span className="text-white flex items-center gap-2 font-mono uppercase tracking-tighter">Solana</span>
+                    <span className="text-white">Solana</span>
                   </div>
                   <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-zinc-500">
                     <span>Asset</span>
-                    <span className="text-white font-mono uppercase tracking-tighter text-racing-green font-bold text-xs">USDC (SPL)</span>
+                    <span className="text-racing-green font-bold text-xs uppercase tracking-tighter">USDC (SPL)</span>
                   </div>
                 </div>
-
                 <div className="space-y-2 text-left">
                   <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-600">Wallet Address</label>
                   <div className="flex gap-2">
-                    <div className="flex-1 bg-[#050505] p-4 rounded-xl border border-white/5 text-[10px] font-mono break-all text-zinc-300 leading-tight">
-                      {walletAddress}
-                    </div>
-                    <button 
-                      onClick={copyAddress}
-                      className="p-4 bg-white text-black rounded-xl hover:bg-[#004225] hover:text-white transition-all flex items-center justify-center"
-                    >
+                    <div className="flex-1 bg-[#050505] p-4 rounded-xl border border-white/5 text-[10px] font-mono break-all text-zinc-300">{walletAddress}</div>
+                    <button onClick={copyAddress} className="p-4 bg-white text-black rounded-xl hover:bg-[#004225] hover:text-white transition-all flex items-center justify-center">
                       {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                     </button>
                   </div>
                 </div>
-
                 <div className="p-6 bg-white/[0.02] border border-dashed border-white/10 rounded-2xl text-center">
-                  <p className="text-[10px] text-zinc-500 uppercase leading-relaxed font-bold tracking-widest">
-                    After payment, please send your transaction hash and login email to our concierge.
-                  </p>
+                  <p className="text-[10px] text-zinc-500 uppercase leading-relaxed font-bold tracking-widest">After payment, please send your transaction hash and login email to our concierge.</p>
                 </div>
               </div>
             </motion.div>
