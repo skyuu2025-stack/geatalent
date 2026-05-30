@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   ArrowUpRight, ShieldCheck, Globe, Cpu, Zap, 
@@ -13,11 +13,44 @@ export default function GeatalentFinalHomePage() {
   const [isPayModalOpen, setIsPayModalOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState({ name: "", price: "" });
   const [copied, setCopied] = useState(false);
+  
+  // --- 实时 Web3 信号状态 ---
+  const [liveSignals, setLiveSignals] = useState([
+    { name: "ANALYZING...", action: "SCANNING", trend: "0.0%", color: "text-zinc-500" },
+    { name: "INITIATING...", action: "MONITORING", trend: "0.0%", color: "text-zinc-500" },
+    { name: "CONNECTING...", action: "FEEDING", trend: "0.0%", color: "text-zinc-500" },
+  ]);
 
-  // 你的 Solana 钱包地址
   const walletAddress = "BQeaNnGCRtBnFye7ynSGhFtgzUgUjiCo4QmAKNbgqWh1";
 
-  // 定义三个档位的价格和环境变量链接
+  // --- 抓取真实 Web3 数据逻辑 ---
+  useEffect(() => {
+    const fetchSignals = async () => {
+      try {
+        // 抓取 Solana 生态最近 24 小时交易量最活跃的代币
+        const response = await fetch('https://api.dexscreener.com/latest/dex/search?q=solana%20ai');
+        const data = await response.json();
+        
+        if (data.pairs) {
+          // 提取前 3 个最相关的实时信号
+          const freshSignals = data.pairs.slice(0, 3).map((pair: any) => ({
+            name: pair.baseToken.symbol,
+            action: pair.priceUsd ? `$${parseFloat(pair.priceUsd).toFixed(4)}` : "TRACKING",
+            trend: `${pair.priceChange.h1 > 0 ? '+' : ''}${pair.priceChange.h1}%`,
+            color: pair.priceChange.h1 > 0 ? "text-[#004225]" : "text-[#002366]"
+          }));
+          setLiveSignals(freshSignals);
+        }
+      } catch (error) {
+        console.error("Web3 Data Fetch Error:", error);
+      }
+    };
+
+    fetchSignals();
+    const interval = setInterval(fetchSignals, 15000); // 每 15 秒更新一次真实信号
+    return () => clearInterval(interval);
+  }, []);
+
   const pricingPlans = [
     { 
       name: "Basic Alpha", 
@@ -54,42 +87,31 @@ export default function GeatalentFinalHomePage() {
   return (
     <div className="bg-[#050505] text-white antialiased overflow-x-hidden min-h-screen font-sans selection:bg-[#004225]">
       
-      {/* 动态背景光晕 */}
       <div className="fixed inset-0 pointer-events-none z-0">
         <div className="absolute top-[-5%] left-[-5%] w-[600px] h-[600px] bg-[#004225]/20 blur-[120px] rounded-full animate-pulse" />
         <div className="absolute bottom-[0%] right-[-5%] w-[500px] h-[500px] bg-[#002366]/15 blur-[120px] rounded-full" />
       </div>
 
-      {/* 导航栏 Navbar */}
       <nav className="fixed top-0 w-full z-50 px-8 py-6 flex justify-between items-center bg-[#050505]/60 backdrop-blur-md border-b border-white/5">
-        <div className="text-xl md:text-2xl font-bold tracking-[0.1em] uppercase text-white">
-          GEATALENT
-        </div>
-        
+        <div className="text-xl md:text-2xl font-bold tracking-[0.1em] uppercase text-white">GEATALENT</div>
         <div className="hidden lg:flex gap-12 items-center text-zinc-400 font-bold uppercase tracking-[0.4em] text-[10px]">
           <Link href="/global-talent" className="hover:text-white transition-colors">Global Talent</Link>
           <Link href="/portfolio-audit" className="hover:text-white transition-colors">Portfolio</Link>
           <a href="#intelligence" className="hover:text-white transition-colors">Intelligence</a>
           <a href="#pricing" className="hover:text-white transition-colors">Pricing</a>
         </div>
-
         <div className="flex items-center gap-4">
           <SignedOut>
             <SignInButton mode="modal">
-              <button className="px-6 py-2 bg-white text-black text-[10px] font-bold uppercase tracking-widest rounded-full hover:bg-[#004225] hover:text-white transition-all">
-                Connect
-              </button>
+              <button className="px-6 py-2 bg-white text-black text-[10px] font-bold uppercase tracking-widest rounded-full hover:bg-[#004225] hover:text-white transition-all">Connect</button>
             </SignInButton>
           </SignedOut>
-          <SignedIn>
-            <UserButton afterSignOutUrl="/" />
-          </SignedIn>
+          <SignedIn><UserButton afterSignOutUrl="/" /></SignedIn>
         </div>
       </nav>
 
       <main className="relative z-10">
         
-        {/* HERO SECTION */}
         <section className="h-screen flex flex-col items-center justify-center text-center px-6 pt-20">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.2 }}>
             <div className="mb-10 flex items-center justify-center gap-4 text-zinc-400 font-bold text-[9px] md:text-[10px] uppercase tracking-[0.4em]">
@@ -104,13 +126,11 @@ export default function GeatalentFinalHomePage() {
             <p className="text-zinc-300 text-sm md:text-lg max-w-xl mx-auto mb-12 leading-relaxed opacity-90 px-4 italic font-light">
               Strategic portfolio architecture and AI-driven intelligence for high-tier professionals.
             </p>
-            <a href="#pricing" className="px-12 py-4 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-widest rounded-full hover:shadow-[0_0_30px_rgba(0,66,37,0.4)] transition-all inline-block">
-              Start Your Journey
-            </a>
+            <a href="#pricing" className="px-12 py-4 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-widest rounded-full hover:shadow-[0_0_30px_rgba(0,66,37,0.4)] transition-all inline-block">Start Your Journey</a>
           </motion.div>
         </section>
 
-        {/* 核心业务网格 - 已连接详情页 */}
+        {/* 核心业务网格 */}
         <section id="talent" className="py-40 px-8 border-y border-white/5 bg-zinc-950/20">
           <div className="max-w-7xl mx-auto">
              <h2 className="text-[10px] font-bold uppercase tracking-[0.5em] text-zinc-700 mb-24 text-center">Core Expertise</h2>
@@ -125,9 +145,7 @@ export default function GeatalentFinalHomePage() {
                       <div className="text-zinc-700 group-hover:text-[#004225] transition-colors mb-10">{s.icon}</div>
                       <h3 className="text-2xl font-medium mb-6 tracking-tight group-hover:text-white transition-colors">{s.title}</h3>
                       <p className="text-zinc-500 text-sm leading-relaxed">{s.desc}</p>
-                      <div className="mt-8 flex items-center gap-2 text-[9px] font-bold uppercase tracking-widest text-[#004225] opacity-0 group-hover:opacity-100 transition-all">
-                        Learn More <ArrowUpRight className="w-3 h-3" />
-                      </div>
+                      <div className="mt-8 flex items-center gap-2 text-[9px] font-bold uppercase tracking-widest text-[#004225] opacity-0 group-hover:opacity-100 transition-all">Learn More <ArrowUpRight className="w-3 h-3" /></div>
                     </div>
                   </Link>
                 ))}
@@ -135,7 +153,7 @@ export default function GeatalentFinalHomePage() {
           </div>
         </section>
 
-        {/* AI 监控看板预览 */}
+        {/* AI 监控看板预览 - 已接入实时信号 */}
         <section id="intelligence" className="py-40 px-8 text-left">
           <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-24 items-center">
             <div>
@@ -149,29 +167,31 @@ export default function GeatalentFinalHomePage() {
             </div>
 
             <div className="relative bg-zinc-950/50 rounded-3xl p-10 overflow-hidden border border-white/5 backdrop-blur-xl">
-              <div className="absolute top-0 right-0 p-4 font-mono text-[8px] text-zinc-800 uppercase">GT_Live_Mode_v1.0</div>
-              <div className="flex items-center gap-4 mb-10 border-b border-white/5 pb-6">
-                <Activity className="w-4 h-4 text-[#004225] animate-pulse" />
-                <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 font-bold">Live Data Stream</span>
+              <div className="absolute top-0 right-0 p-4 font-mono text-[8px] text-zinc-800 uppercase tracking-tighter">GT_LIVE_FEED_v1.0</div>
+              <div className="flex items-center justify-between mb-10 border-b border-white/5 pb-6">
+                <div className="flex items-center gap-4">
+                    <Activity className="w-4 h-4 text-[#004225] animate-pulse" />
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 font-bold">Live SOL/AI Data Stream</span>
+                </div>
+                <div className="text-[9px] font-mono text-zinc-600 uppercase tracking-tighter">Status: Connected</div>
               </div>
               <div className="space-y-6 font-mono text-[11px]">
-                {[
-                  { wallet: "Whale_0x89...ENTRY", action: "BOUGHT $AGI-CORE", trend: "Now", color: "text-[#004225]" },
-                  { wallet: "Founder_Alpha", action: "MONITORING NARRATIVE", trend: "High", color: "text-[#002366]" },
-                  { wallet: "SmartMoney_7", action: "BOUGHT $SOL-AI", trend: "3m ago", color: "text-[#004225]" },
-                ].map((log, i) => (
+                {liveSignals.map((log, i) => (
                   <div key={i} className="flex justify-between items-center border-b border-white/5 pb-4 last:border-0">
-                    <span className="text-zinc-600">{log.wallet}</span>
-                    <span className="font-bold text-zinc-300 uppercase">{log.action}</span>
-                    <span className={`font-bold ${log.color}`}>{log.trend}</span>
+                    <span className="text-zinc-500 text-left w-20">$ {log.name}</span>
+                    <span className="font-bold text-zinc-300 uppercase flex-1 text-center">{log.action}</span>
+                    <span className={`font-bold text-right w-16 ${log.color}`}>{log.trend}</span>
                   </div>
                 ))}
+              </div>
+              <div className="mt-8 text-center">
+                <p className="text-[8px] uppercase tracking-[0.3em] text-zinc-700 animate-pulse">Syncing with Decentralized Exchanges...</p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* 定价方案 Pricing */}
+        {/* 定价方案 */}
         <section id="pricing" className="py-40 px-8 border-t border-white/5">
            <div className="max-w-7xl mx-auto">
               <div className="text-center mb-24 text-left">
@@ -186,25 +206,13 @@ export default function GeatalentFinalHomePage() {
                       <div className="text-5xl font-medium mb-12 text-white">{plan.price}<span className="text-xs text-zinc-700 font-normal"> / mo</span></div>
                       <ul className="space-y-4 mb-16">
                         {plan.features.map(f => (
-                          <li key={f} className="text-[11px] text-zinc-400 flex items-center gap-3">
-                            <Check className="w-3.5 h-3.5 text-[#004225]" /> {f}
-                          </li>
+                          <li key={f} className="text-[11px] text-zinc-400 flex items-center gap-3"><Check className="w-3.5 h-3.5 text-[#004225]" /> {f}</li>
                         ))}
                       </ul>
                     </div>
                     <div className="space-y-4">
-                      <button 
-                        onClick={() => { if (plan.priceLink) window.location.href = plan.priceLink; }}
-                        className={`w-full py-4 text-[10px] font-bold uppercase tracking-widest rounded-full transition-all ${plan.popular ? 'bg-white text-black hover:bg-zinc-200' : 'border border-zinc-800 text-zinc-500 hover:text-white hover:border-white'}`}
-                      >
-                        Access with Card
-                      </button>
-                      <button 
-                        onClick={() => openPayModal(plan.name, plan.price)}
-                        className="flex items-center justify-center gap-2 w-full py-4 text-[10px] font-bold uppercase tracking-widest rounded-full border border-[#002366]/30 text-zinc-500 hover:bg-[#002366] hover:text-white transition-all"
-                      >
-                        <Coins className="w-3.5 h-3.5" /> Pay with USDC
-                      </button>
+                      <button onClick={() => { if (plan.priceLink) window.location.href = plan.priceLink; }} className={`w-full py-4 text-[10px] font-bold uppercase tracking-widest rounded-full transition-all ${plan.popular ? 'bg-white text-black hover:bg-zinc-200' : 'border border-zinc-800 text-zinc-500 hover:text-white hover:border-white'}`}>Access with Card</button>
+                      <button onClick={() => openPayModal(plan.name, plan.price)} className="flex items-center justify-center gap-2 w-full py-4 text-[10px] font-bold uppercase tracking-widest rounded-full border border-[#002366]/30 text-zinc-500 hover:bg-[#002366] hover:text-white transition-all"><Coins className="w-3.5 h-3.5" /> Pay with USDC</button>
                     </div>
                   </div>
                 ))}
@@ -213,29 +221,21 @@ export default function GeatalentFinalHomePage() {
         </section>
       </main>
 
-      {/* --- WEB3 PAYMENT MODAL --- */}
+      {/* --- USDC MODAL (已在之前逻辑中) --- */}
       <AnimatePresence>
         {isPayModalOpen && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsPayModalOpen(false)} className="absolute inset-0 bg-black/90 backdrop-blur-sm" />
-            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="relative w-full max-w-md bg-zinc-950 border border-white/10 p-8 rounded-3xl shadow-2xl">
+            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="relative w-full max-w-md bg-zinc-950 border border-white/10 p-8 rounded-3xl shadow-2xl text-left">
               <button onClick={() => setIsPayModalOpen(false)} className="absolute top-6 right-6 text-zinc-500 hover:text-white"><X className="w-5 h-5" /></button>
-              <div className="mb-8 text-left">
-                <h3 className="text-xl font-serif italic mb-2 text-white">Direct USDC Payment</h3>
-                <p className="text-[10px] text-zinc-500 uppercase tracking-[0.2em]">Plan: {selectedPlan.name} • {selectedPlan.price}</p>
-              </div>
+              <h3 className="text-xl font-serif italic mb-2 text-white">Direct USDC Payment</h3>
+              <p className="text-[10px] text-zinc-500 uppercase mb-8">Plan: {selectedPlan.name} • {selectedPlan.price}</p>
               <div className="space-y-6">
-                <div className="bg-zinc-900/50 p-6 rounded-2xl border border-white/5 space-y-4 text-left">
-                  <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-zinc-500">
-                    <span>Network</span>
-                    <span className="text-white">Solana</span>
-                  </div>
-                  <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-zinc-500">
-                    <span>Asset</span>
-                    <span className="text-racing-green font-bold text-xs uppercase tracking-tighter">USDC (SPL)</span>
-                  </div>
+                <div className="bg-zinc-900/50 p-6 rounded-2xl border border-white/5 space-y-4">
+                  <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-zinc-500"><span>Network</span><span className="text-white">Solana</span></div>
+                  <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-zinc-500"><span>Asset</span><span className="text-racing-green font-bold text-xs uppercase tracking-tighter">USDC (SPL)</span></div>
                 </div>
-                <div className="space-y-2 text-left">
+                <div className="space-y-2">
                   <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-600">Wallet Address</label>
                   <div className="flex gap-2">
                     <div className="flex-1 bg-[#050505] p-4 rounded-xl border border-white/5 text-[10px] font-mono break-all text-zinc-300">{walletAddress}</div>
@@ -245,7 +245,7 @@ export default function GeatalentFinalHomePage() {
                   </div>
                 </div>
                 <div className="p-6 bg-white/[0.02] border border-dashed border-white/10 rounded-2xl text-center">
-                  <p className="text-[10px] text-zinc-500 uppercase leading-relaxed font-bold tracking-widest">After payment, please send your transaction hash and login email to our concierge.</p>
+                  <p className="text-[10px] text-zinc-500 leading-relaxed font-bold tracking-widest">After payment, please send your transaction hash and login email to our concierge.</p>
                 </div>
               </div>
             </motion.div>
