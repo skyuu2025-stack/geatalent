@@ -8,24 +8,26 @@
 }
 
 body {
-  /* 背景不再是纯黑，而是带有微光感的炭黑 */
-  background: radial-gradient(circle at center, #0a0a0a 0%, #050505 100%);
+  /* 修改点：将纯黑改为深邃的杂志梯度色 */
+  background: linear-gradient(135deg, #001a33 0%, #002b1b 100%);
   color: #ffffff;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+  min-height: 100vh;
 }
 
-/* 提升所有副标题的默认亮度 */
-p {
-  color: #a1a1aa; /* 锌灰色 400，比之前的 500 更亮，更易读 */
-}
-
-/* 增加高端纸张的纹理感（可选） */
+/* 模拟高端杂志纸张的噪点纹理 */
 body::before {
   content: "";
   position: fixed;
   top: 0; left: 0; width: 100%; height: 100%;
-  opacity: 0.03;
+  opacity: 0.04;
   pointer-events: none;
+  z-index: 1;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3%3Cfilter id='noiseFilter'%3%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3%3E%3C/filter%3%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3%3E%3C/svg%3%3E");
+}
+
+/* 提升段落文字亮度 */
+p {
+  color: #e5e7eb !important; 
 }
