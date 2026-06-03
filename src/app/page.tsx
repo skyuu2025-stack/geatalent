@@ -132,7 +132,7 @@ export default function GeatalentFinalHomePage() {
                 { icon: <Layers />, title: "Evidences", desc: "背书材料精准封装与法条对齐" },
                 { icon: <Award />, title: "Approval", desc: "英国GT / 美国EB1A 终审获批" }
               ].map((item, i) => (
-                <div key={i} className="bg-[#002b1b]/40 p-12 hover:bg-white hover:text-black transition-all duration-700 group cursor-default">
+                <div key={i} className="bg-[#002b1b]/40 p-12 hover:bg-white hover:text-black transition-all duration-700 group cursor-default text-left">
                   <div className="mb-10 text-white group-hover:text-[#002b1b] transition-colors">{item.icon}</div>
                   <h3 className="text-sm font-bold uppercase tracking-widest mb-4">{item.title}</h3>
                   <p className="text-white/40 text-xs leading-relaxed group-hover:text-black/60 transition-colors">{item.desc}</p>
@@ -170,7 +170,7 @@ export default function GeatalentFinalHomePage() {
 
         {/* 定价方案 */}
         <section id="pricing" className="py-40 px-6 border-t border-white/10">
-          <div className="max-w-7xl mx-auto">
+          <div className="max-w-7xl mx-auto text-left">
             <div className="text-center mb-32 md:text-left">
               <h2 className="text-6xl md:text-8xl font-serif italic mb-8">Investment.</h2>
               <p className="text-white/40 text-[10px] font-bold uppercase tracking-[0.6em]">Visa + Narrative + Global Recognition</p>
@@ -203,28 +203,24 @@ export default function GeatalentFinalHomePage() {
         </section>
       </main>
 
-      {/* --- 更新后的页脚: 包含 Terms & Privacy --- */}
+      {/* --- 页脚: 包含 Terms & Privacy 入口 --- */}
       <footer className="py-24 border-t border-white/10 text-center px-6 bg-[#001a33]/20 backdrop-blur-md">
         <div className="text-3xl font-bold tracking-[0.2em] mb-12 uppercase text-white">GEATALENT</div>
-        
-        {/* 社交媒体 */}
         <div className="flex justify-center gap-12 mb-16">
           {socials.map((s) => (
             <a key={s.name} href={s.href} target="_blank" rel="noopener noreferrer" className="text-white/30 hover:text-white transition-all transform hover:scale-125">{s.icon}</a>
           ))}
         </div>
-
-        {/* 法律链接与版权 */}
         <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-12 pt-8 border-t border-white/5">
           <p className="text-white/20 text-[10px] uppercase tracking-[0.5em] font-medium">© 2024 GEATALENT COPYRIGHT</p>
           <div className="flex gap-8">
-            <Link href="/terms" className="text-white/20 hover:text-[#004225] text-[9px] uppercase tracking-[0.3em] font-bold transition-colors">Terms</Link>
-            <Link href="/privacy" className="text-white/20 hover:text-[#004225] text-[9px] uppercase tracking-[0.3em] font-bold transition-colors">Privacy Policy</Link>
+            <Link href="/terms" className="text-white/20 hover:text-white text-[9px] uppercase tracking-[0.3em] font-bold transition-colors">Terms</Link>
+            <Link href="/privacy" className="text-white/20 hover:text-white text-[9px] uppercase tracking-[0.3em] font-bold transition-colors">Privacy Policy</Link>
           </div>
         </div>
       </footer>
 
-      {/* USDC 支付弹窗 (保持原有逻辑) */}
+      {/* USDC 支付弹窗 */}
       <AnimatePresence>
         {isPayModalOpen && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
@@ -235,8 +231,8 @@ export default function GeatalentFinalHomePage() {
               <p className="text-[10px] text-white/40 uppercase mb-10 text-left">Plan: {selectedPlan.name} • {selectedPlan.price}</p>
               <div className="space-y-6">
                 <div className="bg-white/5 p-8 rounded-3xl border border-white/5 space-y-4 text-left">
-                  <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-white/40"><span>Network</span><span className="text-white">Solana</span></div>
-                  <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-white/40"><span>Asset</span><span className="text-racing-green font-bold text-xs">USDC (SPL)</span></div>
+                  <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-white/40"><span>Network</span><span className="text-white font-mono uppercase">Solana</span></div>
+                  <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-white/40"><span>Asset</span><span className="text-racing-green font-bold text-xs uppercase tracking-tighter">USDC (SPL)</span></div>
                 </div>
                 <div className="space-y-3 text-left">
                   <label className="text-[10px] font-bold uppercase tracking-widest text-white/40 ml-1">Wallet Address</label>
