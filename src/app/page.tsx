@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   ArrowUpRight, ShieldCheck, Globe, Cpu, Zap, 
@@ -16,10 +16,17 @@ const TikTokIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-export default function GeatalentEditorialPage() {
+export default function GeatalentFinalHomePage() {
   const [isPayModalOpen, setIsPayModalOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState({ name: "", price: "" });
   const [copied, setCopied] = useState(false);
+  
+  const [liveSignals, setLiveSignals] = useState([
+    { name: "ANALYZING...", action: "SCANNING", trend: "0.0%", color: "text-zinc-500" },
+    { name: "INITIATING...", action: "MONITORING", trend: "0.0%", color: "text-zinc-500" },
+    { name: "CONNECTING...", action: "FEEDING", trend: "0.0%", color: "text-zinc-500" },
+  ]);
+
   const walletAddress = "BQeaNnGCRtBnFye7ynSGhFtgzUgUjiCo4QmAKNbgqWh1";
 
   const socials = [
@@ -29,6 +36,27 @@ export default function GeatalentEditorialPage() {
     { name: "TikTok", icon: <TikTokIcon className="w-4 h-4" />, href: "https://www.tiktok.com/@geatalent?_r=1&_t=ZS-96nKO9SfUgO" },
   ];
 
+  useEffect(() => {
+    const fetchSignals = async () => {
+      try {
+        const response = await fetch('https://api.dexscreener.com/latest/dex/search?q=solana%20ai');
+        const data = await response.json();
+        if (data.pairs) {
+          const freshSignals = data.pairs.slice(0, 3).map((pair: any) => ({
+            name: pair.baseToken.symbol,
+            action: pair.priceUsd ? `$${parseFloat(pair.priceUsd).toFixed(4)}` : "TRACKING",
+            trend: `${pair.priceChange.h1 > 0 ? '+' : ''}${pair.priceChange.h1}%`,
+            color: pair.priceChange.h1 > 0 ? "text-[#004225]" : "text-[#002366]"
+          }));
+          setLiveSignals(freshSignals);
+        }
+      } catch (error) {}
+    };
+    fetchSignals();
+    const interval = setInterval(fetchSignals, 15000);
+    return () => clearInterval(interval);
+  }, []);
+
   const pricingPlans = [
     { name: "Basic Alpha", price: "£190", priceLink: process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC, features: ["Evidence Audit", "Narrative Strategy", "UK/US Route Map"] },
     { name: "Intel Pro", price: "£490", priceLink: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO, features: ["Full Portfolio Build", "LoR Drafting Strategy", "Authority PR Placement"], popular: true },
@@ -36,16 +64,16 @@ export default function GeatalentEditorialPage() {
   ];
 
   return (
-    <div className="relative min-h-screen font-sans selection:bg-white selection:text-[#002b1b]">
+    <div className="bg-[#050505] text-white antialiased overflow-x-hidden min-h-screen font-sans selection:bg-white selection:text-[#002b1b]">
       
-      {/* 动态光晕 - 采用流行的孔雀蓝和翡翠绿 */}
+      {/* 动态背景光晕 */}
       <div className="fixed inset-0 pointer-events-none z-0">
-        <div className="absolute top-[-10%] left-[-10%] w-[800px] h-[800px] bg-[#004225]/20 blur-[150px] rounded-full animate-pulse" />
-        <div className="absolute bottom-[-5%] right-[-5%] w-[800px] h-[800px] bg-[#002366]/20 blur-[150px] rounded-full" />
+        <div className="absolute top-[-10%] left-[-10%] w-[800px] h-[800px] bg-[#004225]/15 blur-[150px] rounded-full animate-pulse" />
+        <div className="absolute bottom-[-5%] right-[-5%] w-[800px] h-[800px] bg-[#002366]/15 blur-[150px] rounded-full" />
       </div>
 
       <nav className="fixed top-0 w-full z-50 px-8 py-6 flex justify-between items-center bg-[#001a33]/40 backdrop-blur-xl border-b border-white/5">
-        <div className="text-xl md:text-2xl font-bold tracking-[0.1em] uppercase text-white">GEATALENT</div>
+        <div className="text-xl md:text-2xl font-bold tracking-[0.1em] uppercase text-white cursor-default">GEATALENT</div>
         <div className="hidden lg:flex gap-10 items-center text-white/60 font-bold uppercase tracking-[0.4em] text-[10px]">
           <Link href="/global-talent" className="hover:text-white transition-colors">Visa Pathways</Link>
           <Link href="/portfolio-audit" className="hover:text-white transition-colors">Audit</Link>
@@ -53,6 +81,11 @@ export default function GeatalentEditorialPage() {
           <a href="#pricing" className="hover:text-white transition-colors">Pricing</a>
         </div>
         <div className="flex items-center gap-6">
+          <div className="hidden sm:flex gap-4 border-r border-white/10 pr-6 mr-2">
+            {socials.map((s) => (
+              <a key={s.name} href={s.href} target="_blank" rel="noopener noreferrer" className="text-white/30 hover:text-white transition-all transform hover:scale-125">{s.icon}</a>
+            ))}
+          </div>
           <SignedOut>
             <SignInButton mode="modal">
               <button className="px-6 py-2 bg-white text-[#001a33] text-[10px] font-bold uppercase tracking-widest rounded-full hover:bg-zinc-200 transition-all">Connect</button>
@@ -64,7 +97,7 @@ export default function GeatalentEditorialPage() {
 
       <main className="relative z-10">
         
-        {/* --- HERO: 杂志大片感 --- */}
+        {/* --- HERO SECTION --- */}
         <section className="h-screen flex flex-col items-center justify-center text-center px-6 pt-20">
           <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1.5 }}>
             <div className="mb-10 flex items-center justify-center gap-4 text-white/40 font-bold text-[9px] md:text-[10px] uppercase tracking-[0.4em]">
@@ -76,18 +109,18 @@ export default function GeatalentEditorialPage() {
               MASTER <br />
               <span className="font-serif italic font-light text-zinc-300">THE CIRCUIT.</span>
             </h1>
-            <p className="text-white/80 text-sm md:text-xl max-w-3xl mx-auto mb-16 leading-relaxed font-light italic">
+            <p className="text-white/80 text-sm md:text-xl max-w-3xl mx-auto mb-16 leading-relaxed font-light italic opacity-90">
               Strategic Portfolio, Global PR, and Fashion Week Credentials for <br className="hidden md:block" />
               <strong>UK Global Talent</strong> and <strong>US EB-1A</strong> Extraordinary Ability.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-8">
               <Link href="/assessment" className="px-14 py-5 bg-white text-[#001a33] text-[10px] font-bold uppercase tracking-widest rounded-full hover:bg-zinc-200 transition-all shadow-2xl">Start Assessment</Link>
-              <Link href="/global-talent" className="text-[10px] font-bold uppercase tracking-widest text-white/60 hover:text-white flex items-center gap-2 transition-all">Service Loop <ArrowUpRight className="w-4 h-4" /></Link>
+              <Link href="/case-studies" className="text-[10px] font-bold uppercase tracking-widest text-white/60 hover:text-white flex items-center gap-2 transition-all">Benchmarks <ArrowUpRight className="w-4 h-4" /></Link>
             </div>
           </motion.div>
         </section>
 
-        {/* --- 业务闭环可视化 --- */}
+        {/* 业务闭环可视化 */}
         <section className="py-40 px-6 border-y border-white/10 bg-white/[0.02]">
           <div className="max-w-7xl mx-auto">
             <h2 className="text-[10px] font-bold uppercase tracking-[0.6em] text-white/30 mb-24 text-center">The Endorsement Lifecycle</h2>
@@ -109,45 +142,36 @@ export default function GeatalentEditorialPage() {
           </div>
         </section>
 
-        {/* --- 时装周资源 --- */}
-        <section className="py-40 px-6 overflow-hidden">
-          <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-32 items-center">
-            <motion.div whileInView={{ x: [-20, 0], opacity: [0, 1] }}>
-              <div className="flex items-center gap-2 mb-8">
-                <div className="w-2 h-2 rounded-full bg-[#004225] shadow-[0_0_10px_#004225]" />
-                <span className="text-[10px] font-bold uppercase tracking-widest text-white/40 font-mono">Industry_Credentials_Access</span>
+        {/* AI 看板预览 */}
+        <section id="intelligence" className="py-40 px-8 text-left">
+          <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-24 items-center">
+            <div>
+              <h2 className="text-5xl md:text-6xl font-serif italic mb-8">Signals in <br />the Noise.</h2>
+              <p className="text-zinc-500 text-lg mb-12 leading-relaxed max-w-md">Our AI monitoring engine tracks smart money movements and founder narratives 24/7 across the UK Web3 ecosystem.</p>
+              <button className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.3em] text-[#004225] hover:text-white transition-colors group">Explore Alpha Dashboard <ChevronRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" /></button>
+            </div>
+            <div className="relative bg-zinc-950/50 rounded-3xl p-10 overflow-hidden border border-white/5 backdrop-blur-xl">
+              <div className="flex items-center justify-between mb-10 border-b border-white/5 pb-6">
+                <div className="flex items-center gap-4"><Activity className="w-4 h-4 text-[#004225] animate-pulse" /><span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 font-bold">Live SOL Data Feed</span></div>
+                <div className="text-[9px] font-mono text-zinc-600 uppercase">Status: Connected</div>
               </div>
-              <h2 className="text-5xl md:text-7xl font-serif italic mb-10 leading-tight">Fashion Week <br />Placement.</h2>
-              <p className="text-white/70 text-lg leading-relaxed mb-12 font-light">
-                我们为申请人提供直接通往伦敦、米兰、巴黎时装周的行业门票。通过举办展览、联合发布或官方Showroom计划，为您累积作为“杰出人才”最具说服力的现场证据。
-              </p>
-              <ul className="space-y-6">
-                {["LFW/PFW Official Listing Support", "Industry-Grade Media Kit Build", "Curatorial Recognition Strategy"].map(list => (
-                  <li key={list} className="flex items-center gap-4 text-xs font-bold uppercase tracking-widest text-white/50">
-                    <Check className="w-4 h-4 text-white" /> {list}
-                  </li>
-                ))}
-              </ul>
-            </motion.div>
-            
-            <div className="relative">
-              <div className="grid grid-cols-2 gap-4">
-                {["LONDON", "PARIS", "MILAN", "NEW YORK"].map((city, idx) => (
-                  <div key={city} className="aspect-square border border-white/10 flex flex-col items-center justify-center bg-white/[0.03] hover:border-white transition-all group">
-                    <MapPin className="mb-4 text-white/20 group-hover:text-white transition-all" />
-                    <span className="text-[10px] font-bold tracking-[0.5em] text-white/40 group-hover:text-white">{city}</span>
+              <div className="space-y-6 font-mono text-[11px]">
+                {liveSignals.map((log, i) => (
+                  <div key={i} className="flex justify-between items-center border-b border-white/5 pb-4 last:border-0">
+                    <span className="text-zinc-500 w-20">$ {log.name}</span>
+                    <span className="font-bold text-zinc-300 flex-1 text-center">{log.action}</span>
+                    <span className={`font-bold text-right w-16 ${log.color}`}>{log.trend}</span>
                   </div>
                 ))}
               </div>
-              <div className="absolute -bottom-10 -right-10 w-64 h-64 bg-[#002366]/30 blur-[100px] rounded-full" />
             </div>
           </div>
         </section>
 
-        {/* --- 定价模块 --- */}
+        {/* 定价方案 */}
         <section id="pricing" className="py-40 px-6 border-t border-white/10">
           <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-32">
+            <div className="text-center mb-32 md:text-left">
               <h2 className="text-6xl md:text-8xl font-serif italic mb-8">Investment.</h2>
               <p className="text-white/40 text-[10px] font-bold uppercase tracking-[0.6em]">Visa + Narrative + Global Recognition</p>
             </div>
@@ -179,17 +203,28 @@ export default function GeatalentEditorialPage() {
         </section>
       </main>
 
+      {/* --- 更新后的页脚: 包含 Terms & Privacy --- */}
       <footer className="py-24 border-t border-white/10 text-center px-6 bg-[#001a33]/20 backdrop-blur-md">
         <div className="text-3xl font-bold tracking-[0.2em] mb-12 uppercase text-white">GEATALENT</div>
+        
+        {/* 社交媒体 */}
         <div className="flex justify-center gap-12 mb-16">
           {socials.map((s) => (
             <a key={s.name} href={s.href} target="_blank" rel="noopener noreferrer" className="text-white/30 hover:text-white transition-all transform hover:scale-125">{s.icon}</a>
           ))}
         </div>
-        <p className="text-white/20 text-[10px] uppercase tracking-[0.5em] font-medium">© 2024 GEATALENT COPYRIGHT</p>
+
+        {/* 法律链接与版权 */}
+        <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-12 pt-8 border-t border-white/5">
+          <p className="text-white/20 text-[10px] uppercase tracking-[0.5em] font-medium">© 2024 GEATALENT COPYRIGHT</p>
+          <div className="flex gap-8">
+            <Link href="/terms" className="text-white/20 hover:text-[#004225] text-[9px] uppercase tracking-[0.3em] font-bold transition-colors">Terms</Link>
+            <Link href="/privacy" className="text-white/20 hover:text-[#004225] text-[9px] uppercase tracking-[0.3em] font-bold transition-colors">Privacy Policy</Link>
+          </div>
+        </div>
       </footer>
 
-      {/* USDC 支付弹窗 (保持不变，已更新背景) */}
+      {/* USDC 支付弹窗 (保持原有逻辑) */}
       <AnimatePresence>
         {isPayModalOpen && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
@@ -197,13 +232,13 @@ export default function GeatalentEditorialPage() {
             <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="relative w-full max-w-md bg-[#002b1b] border border-white/10 p-10 rounded-[40px] shadow-2xl">
               <button onClick={() => setIsPayModalOpen(false)} className="absolute top-8 right-8 text-white/40 hover:text-white"><CloseIcon className="w-5 h-5" /></button>
               <h3 className="text-2xl font-serif italic mb-2 text-white">Direct Transfer</h3>
-              <p className="text-[10px] text-white/40 uppercase mb-10">Plan: {selectedPlan.name} • {selectedPlan.price}</p>
+              <p className="text-[10px] text-white/40 uppercase mb-10 text-left">Plan: {selectedPlan.name} • {selectedPlan.price}</p>
               <div className="space-y-6">
-                <div className="bg-white/5 p-8 rounded-3xl border border-white/5 space-y-4">
-                  <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-white/40"><span>Network</span><span className="text-white font-mono uppercase">Solana</span></div>
-                  <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-white/40"><span>Asset</span><span className="text-white font-bold text-xs">USDC (SPL)</span></div>
+                <div className="bg-white/5 p-8 rounded-3xl border border-white/5 space-y-4 text-left">
+                  <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-white/40"><span>Network</span><span className="text-white">Solana</span></div>
+                  <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-white/40"><span>Asset</span><span className="text-racing-green font-bold text-xs">USDC (SPL)</span></div>
                 </div>
-                <div className="space-y-3">
+                <div className="space-y-3 text-left">
                   <label className="text-[10px] font-bold uppercase tracking-widest text-white/40 ml-1">Wallet Address</label>
                   <div className="flex gap-2">
                     <div className="flex-1 bg-black/40 p-5 rounded-2xl border border-white/5 text-[10px] font-mono break-all text-white/80 leading-relaxed">{walletAddress}</div>
