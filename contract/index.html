@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GEA SHOWCASE | DIGITAL CONTRACT</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            background-color: #EFECE5;
+        }
+        iframe {
+            border: none;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <!-- 使用 iframe 隔离嵌入，同时授权系统调用相册拍摄签名和剪贴板复制凭证 -->
+    <iframe id="contractIframe" src="" allow="clipboard-read; clipboard-write; camera"></iframe>
+
+    <script>
+        // 1. 获取当前浏览器地址栏里的全部动态参数（如：?contractId=xxx 或手机扫完码生成的 ?sign=true）
+        const currentQueryParams = window.location.search;
+        
+        // 2. 配置我们在 Cloud Run 容器部署的真实后台链接 (即您的 Shared App URL)
+        const cloudRunBaseUrl = "https://ais-pre-2senp2qdzv5idpobjxnts3-673986691637.asia-east1.run.app/";
+        
+        // 3. 构建并传递 parentUrl，让 iframe 内部生成的二维码天然回切您的高定域名 geatalent.uk
+        const parentUrlParam = "parentUrl=" + encodeURIComponent(window.location.origin + window.location.pathname);
+        
+        // 4. 组装参数
+        let iframeUrl = cloudRunBaseUrl;
+        if (currentQueryParams) {
+            iframeUrl += currentQueryParams + "&" + parentUrlParam;
+        } else {
+            iframeUrl += "?" + parentUrlParam;
+        }
+        
+        // 5. 正式加载 iframe 内页
+        document.getElementById("contractIframe").src = iframeUrl;
+    </script>
+</body>
+</html>
