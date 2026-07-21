@@ -184,28 +184,22 @@ export default function GeatalentGlobalTalentPage() {
       </footer>
 
       {/* --- CHAT SYSTEM --- */}
-      <div className="fixed bottom-8 right-8 z-[150]">
-        <button onClick={() => setIsChatOpen(!isChatOpen)} className="w-16 h-16 bg-[#004225] text-white rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-all duration-500 group relative">
-          {isChatOpen ? <CloseIcon className="w-6 h-6" /> : <MessageCircle className="w-6 h-6" />}
-          {!isChatOpen && <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-[#050505] animate-bounce" />}
-        </button>
-        <AnimatePresence>
-          {isChatOpen && (
-            <motion.div initial={{ opacity: 0, y: 20, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 20, scale: 0.95 }} className="absolute bottom-20 right-0 w-[350px] md:w-[400px] h-[500px] bg-[#001a33]/95 backdrop-blur-2xl border border-white/10 rounded-[32px] shadow-2xl flex flex-col overflow-hidden">
-              <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
-                <div className="flex items-center gap-3"><div className="w-2 h-2 rounded-full bg-[#004225] animate-pulse" /><span className="text-[10px] font-bold uppercase tracking-widest text-white/80">Strategy Concierge</span></div>
-              </div>
-              <div className="flex-1 overflow-y-auto p-6 space-y-6">
-                {messages.map((msg, i) => (
-                  <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-[80%] p-4 rounded-[20px] text-xs leading-relaxed ${msg.role === 'user' ? 'bg-[#004225] text-white' : 'bg-white/5 text-white/70 border border-white/5'}`}>{msg.content}</div>
-                  </div>
-                ))}
-                <div ref={chatEndRef} />
-              </div>
-              <form onSubmit={(e) => { e.preventDefault(); if(!inputValue) return; setMessages([...messages, {role:'user', content: inputValue}]); setInputValue(""); }} className="p-4 bg-white/[0.02] border-t border-white/5 flex gap-2">
-                <input type="text" value={inputValue} onChange={(e)=>setInputValue(e.target.value)} placeholder="Ask about EB-1A or NIW..." className="flex-1 bg-white/5 border border-white/10 rounded-full px-4 py-3 text-xs outline-none focus:border-[#004225] text-white" />
-                <button type="submit" className="w-10 h-10 bg-white text-[#001a33] rounded-full flex items-center justify-center hover:bg-[#004225] hover:text-white transition-all"><Send className="w-4 h-4" /></button>
+     {/* 修改点：添加 onSubmit 和 Formspree 集成 */}
+<form 
+  action="你的FORMSPREE链接" 
+  method="POST"
+  className="space-y-8"
+>
+  <input name="name" type="text" required className="..." placeholder="Full Name" />
+  <select name="sector" className="...">
+    <option>AI & Digital Technology</option>
+    <option>Fine Art & Visual Culture</option>
+    <option>Fashion & Design</option>
+  </select>
+  <textarea name="message" rows={4} required className="..." placeholder="Career Narrative..." />
+  <button type="submit" className="...">
+    Submit Initial Assessment
+  </button>
               </form>
             </motion.div>
           )}
