@@ -186,7 +186,7 @@ export default function GeatalentGlobalTalentPage() {
       {/* --- CHAT SYSTEM --- */}
      {/* 修改点：添加 onSubmit 和 Formspree 集成 */}
 <form 
-  action="你的FORMSPREE链接" 
+  action="https://formspree.io/f/mlgqlazv" 
   method="POST"
   className="space-y-8"
 >
